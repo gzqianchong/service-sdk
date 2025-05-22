@@ -15,6 +15,8 @@ class Model extends \Illuminate\Database\Eloquent\Model
 
     protected $keyType = 'string';
 
+    public static $uniqueKeys = [];
+
     protected static function boot()
     {
         parent::boot();

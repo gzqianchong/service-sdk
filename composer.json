@@ -14,7 +14,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "App\\Providers\\SdkServiceProvider"
+                "App\\Providers\\ServiceSdkServiceProvider"
             ]
         }
     }
