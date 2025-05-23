@@ -127,6 +127,20 @@ abstract class Core
         return $results;
     }
 
+    final protected function camel($array)
+    {
+        $results = [];
+        foreach ($array as $key => $value) {
+            $camelKey = Str::camel($key);
+            if (is_array($value) && !empty($value)) {
+                $results[$camelKey] = $this->camel($value);
+            } else {
+                $results[$camelKey] = $value;
+            }
+        }
+        return $results;
+    }
+
     protected function request()
     {
 
