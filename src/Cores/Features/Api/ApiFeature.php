@@ -11,7 +11,7 @@ abstract class ApiFeature extends Feature
 {
     protected function filters(Builder $builder)
     {
-        $filters = (array) $this->data->getItem('filter');
+        $filters = (array) $this->getRequest('filter');
         if (empty($filters)) {
             return $builder;
         }
