@@ -4,12 +4,44 @@ namespace App\Cores\Features\Api;
 
 use App\Cores\Features\Feature;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 abstract class ApiFeature extends Feature
 {
+    protected function filters(Builder $builder)
+    {
+        $filters = (array) $this->data->getItem('filter');
+        if (empty($filters)) {
+            return $builder;
+        }
+        foreach ($filters as $field => $filter) {
+            $builder = $this->filter($builder, $field, $filter);
+        }
+        return $builder;
+    }
+
+    protected function filter(Builder $builder, $field, $filter)
+    {
+        $option = Arr::first($filter);
+        $value = Arr::last($filter);
+        switch ($option) {
+            case 'in':
+                $builder->whereIn($field, (array) $value);
+                break;
+            case 'between':
+                $builder->whereBetween($field, (array) $value);
+                break;
+            default:
+                $builder->where($field, $option, $value);
+                break;
+        }
+        return $builder;
+    }
+
     protected function lists(Builder $builder, $callback = null)
     {
+        $builder = $this->filters($builder);
         if ($this->getPage() || $this->getPageSize()) {
             $model = $builder->paginate($this->getPageSize(), ['*'], '', $this->getPage());
             $items = Collection::make($model->items())->toArray();
