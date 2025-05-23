@@ -5,7 +5,6 @@ namespace App\Cores\Features;
 use App\Cores\Core;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 abstract class Feature extends Core
 {
@@ -20,20 +19,6 @@ abstract class Feature extends Core
             $this->exception($exception);
         }
         return $this;
-    }
-
-    final protected function camel($array)
-    {
-        $results = [];
-        foreach ($array as $key => $value) {
-            $camelKey = Str::camel($key);
-            if (is_array($value) && !empty($value)) {
-                $results[$camelKey] = $this->camel($value);
-            } else {
-                $results[$camelKey] = $value;
-            }
-        }
-        return $results;
     }
 
     protected function exception(Exception $exception)

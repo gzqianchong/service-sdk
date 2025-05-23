@@ -113,7 +113,7 @@ abstract class Core
         }
     }
 
-    final protected function snake($array)
+    protected function snake($array)
     {
         $results = [];
         foreach ($array as $key => $value) {
@@ -127,7 +127,7 @@ abstract class Core
         return $results;
     }
 
-    final protected function camel($array)
+    protected function camel($array)
     {
         $results = [];
         foreach ($array as $key => $value) {
