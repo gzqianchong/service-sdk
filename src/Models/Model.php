@@ -5,6 +5,8 @@ namespace App\Models;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Model extends \Illuminate\Database\Eloquent\Model
@@ -34,5 +36,54 @@ class Model extends \Illuminate\Database\Eloquent\Model
     final public static function init()
     {
         return new static();
+    }
+
+    public static function add($data = [])
+    {
+        $model = static::withTrashed()
+            ->withoutGlobalScopes()
+            ->firstOrNew(Arr::only($data, static::$uniqueKeys));
+        $model->fill(Arr::whereNotNull($data));
+        $model->save();
+        return $model;
+    }
+
+    public static function edit($data = [])
+    {
+        $model = static::withTrashed()
+            ->withoutGlobalScopes()
+            ->findOrFail(Arr::get($data, 'id'));
+        $model->fill(Arr::whereNotNull($data));
+        $model->save();
+        return $model;
+    }
+
+    public static function lists($data = [], $callback = null)
+    {
+        $model = static::query();
+        $page = Arr::get($data, 'page');
+        $pageSize = Arr::get($data, 'page_size');
+        if ($page || $pageSize) {
+            $model = $model->paginate(Arr::get($data, 'page'), ['*'], '', $pageSize);
+            $items = Collection::make($model->items())->toArray();
+            if ($callback) {
+                $items = call_user_func($callback, $items);
+            }
+            return [
+                'items' => $items,
+                'total' => $model->total(),
+                'pageSize' => $model->perPage(),
+                'page' => $model->currentPage(),
+            ];
+        } else {
+            $items = $model->get()
+                ->toArray();
+            if ($callback) {
+                $items = call_user_func($callback, $items);
+            }
+            return [
+                'items' => $items,
+            ];
+        }
     }
 }
